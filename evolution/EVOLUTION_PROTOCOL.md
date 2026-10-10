@@ -79,3 +79,5 @@
 `evolution/experiments/004-positive-open-fallback.md` 是当前保留的 Challenger：平开候选不直接递补，继续沿原队列寻找更强的可执行候选；样本不足，暂不晋级。
 
 `evolution/experiments/005-positive-open-validation.md` 是该 Challenger 的 2026 年 8 月时间外验证，未复现改善，因此拒绝晋级。
+
+`evolution/experiments/006-environment-rank1-veto.md` 测试了“进攻/修复环境跳过第一候选”的单一假设；7 月变差，8 月虽有表面改善但减少交易且仍有大额亏损，因此拒绝晋级。
