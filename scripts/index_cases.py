@@ -13,7 +13,8 @@ for path in sorted(CASE_DIR.glob("*.md")):
     text = path.read_text(encoding="utf-8")
     dates = re.search(r"盘后冻结日 D：([0-9-]+).*?确认日 D\+1：([0-9-]+)", text, re.S)
     candidates = re.search(r"## 3\. 冻结候选.*?\n\n(.*?)(?=\n## 4\.)", text, re.S)
-    count = max(0, len(re.findall(r"^\|[^|]+\|[^|]+\|", candidates.group(1), re.M)) - 1) if candidates else 0
+    # The candidate table has one header row and one separator row.
+    count = max(0, len(re.findall(r"^\|[^|]+\|[^|]+\|", candidates.group(1), re.M)) - 2) if candidates else 0
     decision, confirmation = dates.groups() if dates else (path.stem, "")
     rows.append(f"{decision},{confirmation},{count},{'yes' if '## 4.' in text else 'no'}")
 
