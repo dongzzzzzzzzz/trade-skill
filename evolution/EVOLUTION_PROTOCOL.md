@@ -77,3 +77,5 @@
 `evolution/experiments/003-correct-locked-auction.md` 修正了实验 002 的未来信息污染，并把锁板识别改为 09:25 前竞价字段。
 
 `evolution/experiments/004-positive-open-fallback.md` 是当前保留的 Challenger：平开候选不直接递补，继续沿原队列寻找更强的可执行候选；样本不足，暂不晋级。
+
+`evolution/experiments/005-positive-open-validation.md` 是该 Challenger 的 2026 年 8 月时间外验证，未复现改善，因此拒绝晋级。

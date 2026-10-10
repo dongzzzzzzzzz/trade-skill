@@ -5,11 +5,15 @@ from __future__ import annotations
 
 import csv
 import statistics
+import argparse
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
-SOURCE = ROOT / "results" / "2026-07-market-outcomes.csv"
-OUT = ROOT / "results" / "2026-07-policy-comparison.csv"
+parser = argparse.ArgumentParser()
+parser.add_argument("--month", default="2026-07")
+args = parser.parse_args()
+SOURCE = ROOT / "results" / f"{args.month}-market-outcomes.csv"
+OUT = ROOT / "results" / f"{args.month}-policy-comparison.csv"
 
 rows = list(csv.DictReader(SOURCE.open(encoding="utf-8")))
 dates = sorted({row["decision_date"] for row in rows})

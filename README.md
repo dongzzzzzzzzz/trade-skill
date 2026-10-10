@@ -10,6 +10,7 @@
 - `SKILL.md`：当前 Champion 初始版本。
 - `cases/2026-07/`：2026 年 7 月逐日回放案例。每个案例只使用 D 日盘后信息和 D+1 09:25 前竞价信息。
 - `evolution/`：Darwin 的进化协议、晋级规则和人工确认边界。
+- `evolution/USER_EXECUTION_POLICY.md`：你的个人顺序递补规则，属于约束，不作为 Darwin 随意删除的目标。
 - `results/`：把案例转成真实执行结果前需要补充的记录。
 - `test-prompts.json`：给 Darwin 使用的交易场景测试集。
 - `scripts/`：案例索引和结果模板生成工具。
@@ -17,7 +18,7 @@
 
 ## 当前状态
 
-7 月案例已经完成“盘后冻结候选 + 次日竞价验货”，但还没有你的真实成交、买入价、卖出价和持有结果。因此当前只能作为 `v0` 规则基线，不能据此宣称收益提升，也不能直接让 Darwin 以默认 9 维 Skill 分数晋级交易规则。
+7 月和 8 月案例已经完成“盘后冻结候选 + 次日竞价验货”。当前结果仍是统一代理口径，不是你的真实成交记录，不能据此宣称收益提升，也不能直接让 Darwin 以默认 9 维 Skill 分数晋级交易规则。
 
 运行 `scripts/build_outcome_template.py` 可生成逐候选的真实结果填写表；运行 `scripts/build_proxy_baseline.py` 可先生成一套明确标注为代理的 v0 基线，再开始 Champion / Challenger 对照进化。
 
