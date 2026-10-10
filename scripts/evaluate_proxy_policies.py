@@ -11,9 +11,11 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 parser = argparse.ArgumentParser()
 parser.add_argument("--month", default="2026-07")
+parser.add_argument("--source", type=Path, help="Alternative market outcomes CSV")
+parser.add_argument("--output", type=Path, help="Alternative comparison CSV")
 args = parser.parse_args()
-SOURCE = ROOT / "results" / f"{args.month}-market-outcomes.csv"
-OUT = ROOT / "results" / f"{args.month}-policy-comparison.csv"
+SOURCE = args.source or ROOT / "results" / f"{args.month}-market-outcomes.csv"
+OUT = args.output or ROOT / "results" / f"{args.month}-policy-comparison.csv"
 
 rows = list(csv.DictReader(SOURCE.open(encoding="utf-8")))
 dates = sorted({row["decision_date"] for row in rows})

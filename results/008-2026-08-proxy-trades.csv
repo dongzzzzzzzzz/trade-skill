@@ -1,0 +1,16 @@
+decision_date,confirmation_date,selected_rank,symbol,name,entry_rule,entry_price,exit_rule,exit_price,return_pct,max_adverse_pct
+2026-08-04,2026-08-05,1,sz003032,传智教育,first candidate whose case action contains 可做 and whose auction is not locked,11.72,same-day close,11.73,0.08532423208191808,-2.4744027303754357
+2026-08-05,2026-08-06,3,sz002963,豪尔赛,first candidate whose case action contains 可做 and whose auction is not locked,19.34,same-day close,19.35,0.05170630816959676,-4.239917269906934
+2026-08-06,2026-08-07,8,sz002552,宝鼎科技,first candidate whose case action contains 可做 and whose auction is not locked,47.0,same-day close,47.6,1.276595744680864,0.0
+2026-08-07,2026-08-10,1,sz002552,宝鼎科技,first candidate whose case action contains 可做 and whose auction is not locked,52.36,same-day close,52.36,0.0,-3.4950343773873183
+2026-08-10,2026-08-11,1,sh600721,百花医药,first candidate whose case action contains 可做 and whose auction is not locked,12.75,same-day close,12.75,0.0,-1.4117647058823457
+2026-08-12,2026-08-13,2,sh603758,秦安股份,first candidate whose case action contains 可做 and whose auction is not locked,15.35,same-day close,15.35,0.0,0.0
+2026-08-14,2026-08-17,5,sh603330,天洋新材,first candidate whose case action contains 可做 and whose auction is not locked,11.75,same-day close,11.75,0.0,0.0
+2026-08-17,2026-08-18,1,sh603330,天洋新材,first candidate whose case action contains 可做 and whose auction is not locked,12.93,same-day close,11.19,-13.457076566125291,-18.174787316318643
+2026-08-18,2026-08-19,6,sh600127,金健米业,first candidate whose case action contains 可做 and whose auction is not locked,7.82,same-day close,7.82,0.0,0.0
+2026-08-20,2026-08-21,1,sh600127,金健米业,first candidate whose case action contains 可做 and whose auction is not locked,9.39,same-day close,8.2,-12.67305644302451,-14.80298189563366
+2026-08-21,2026-08-24,1,sz002412,汉森制药,first candidate whose case action contains 可做 and whose auction is not locked,10.9,same-day close,11.21,2.8440366972477094,-0.09174311926605228
+2026-08-25,2026-08-26,5,sz002445,中南文化,first candidate whose case action contains 可做 and whose auction is not locked,4.08,same-day close,3.6,-11.764705882352944,-13.480392156862752
+2026-08-26,2026-08-27,3,sz002084,海鸥住工,first candidate whose case action contains 可做 and whose auction is not locked,5.27,same-day close,5.27,0.0,0.0
+2026-08-27,2026-08-28,2,sz003040,楚天龙,first candidate whose case action contains 可做 and whose auction is not locked,19.05,same-day close,18.5,-2.887139107611547,-6.5616797900262425
+2026-08-31,2026-09-01,1,sz002084,海鸥住工,first candidate whose case action contains 可做 and whose auction is not locked,7.02,same-day close,7.02,0.0,0.0

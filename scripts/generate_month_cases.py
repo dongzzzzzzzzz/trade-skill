@@ -83,6 +83,17 @@ def market_environment(client: TdxClient, day: dt.date, limit_rows: list[dict[st
     denom = ups + broken
     broken_rate = broken / denom * 100 if denom else None
     sh = vals.get("sh000001", {})
+    sz = vals.get("sz399001", {})
+    cy = vals.get("sz399006", {})
+    breadth_balance = ups - downs
+    risk_pressure = downs + broken
+    index_direction = "上涨" if (sh.get("change_pct") or 0) > 0 else "下跌"
+    index_alignment = (
+        "三指数共振"
+        if all((v.get("change_pct") or 0) > 0 for v in (sh, sz, cy))
+        or all((v.get("change_pct") or 0) < 0 for v in (sh, sz, cy))
+        else "指数分化"
+    )
     if downs > ups or (broken_rate is not None and broken_rate >= 40) or (sh.get("change_pct") is not None and sh["change_pct"] <= -1):
         regime = "退潮/防守"
     elif (sh.get("change_pct") is not None and sh["change_pct"] >= 0 and ups > downs and (broken_rate is None or broken_rate < 30)):
@@ -91,11 +102,65 @@ def market_environment(client: TdxClient, day: dt.date, limit_rows: list[dict[st
         regime = "分歧/试错"
     else:
         regime = "等待"
+    emotion_axis = {
+        "breadth_balance": breadth_balance,
+        "risk_pressure": risk_pressure,
+        "limit_up": ups,
+        "limit_down": downs,
+        "broken_rate": broken_rate,
+        "highest_board": max((r.get("board_level") or 0) for r in limit_rows),
+    }
     return {"indices": vals, "limit_up": ups, "broken": broken, "limit_down": downs,
-            "broken_rate": broken_rate, "regime": regime}
+            "broken_rate": broken_rate, "regime": regime,
+            "index_direction": index_direction, "index_alignment": index_alignment,
+            "breadth_balance": breadth_balance, "risk_pressure": risk_pressure,
+            "emotion_axis": emotion_axis}
+
+
+def display_theme(row: dict[str, Any]) -> str:
+    return str(row.get("limit_reason") or row.get("industry") or "缺失")
+
+
+def enrich_candidates(rows: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    ups = [row for row in rows if row.get("limit_type") == 1]
+    profiles: dict[str, dict[str, Any]] = {}
+    for row in ups:
+        theme = display_theme(row)
+        profile = profiles.setdefault(theme, {"count": 0, "highest_board": 0})
+        profile["count"] += 1
+        profile["highest_board"] = max(profile["highest_board"], row.get("board_level") or 0)
+    market_highest = max((row.get("board_level") or 0) for row in rows) if rows else 0
+    for row in rows:
+        theme = display_theme(row)
+        profile = profiles.get(theme, {"count": 1, "highest_board": row.get("board_level") or 0})
+        peer_rows = [peer for peer in ups if display_theme(peer) == theme]
+        peer_rows.sort(key=lambda peer: (-(peer.get("board_level") or 0), -(peer.get("seal_amount") or 0), peer.get("limit_time") or "99:99:99"))
+        peer_rank = next((i for i, peer in enumerate(peer_rows, 1) if peer.get("full_code") == row.get("full_code")), None)
+        board = row.get("board_level") or 0
+        facts = []
+        if row.get("limit_type") == 3:
+            facts.append("炸板/分歧")
+        if board == market_highest and board > 0:
+            facts.append("市场最高板")
+        if peer_rank == 1:
+            facts.append("题材前排")
+        if board <= 2 and profile["count"] >= 2:
+            facts.append("低位题材参与")
+        if not facts:
+            facts.append("板位接力")
+        row.update({
+            "theme": theme,
+            "theme_count": profile["count"],
+            "theme_highest_board": profile["highest_board"],
+            "theme_rank": peer_rank,
+            "market_highest_board": market_highest,
+            "node_facts": ";".join(facts),
+        })
+    return rows
 
 
 def pick_candidates(limit_rows: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    limit_rows = enrich_candidates(limit_rows)
     ups = [r for r in limit_rows if r.get("limit_type") == 1]
     broken = [r for r in limit_rows if r.get("limit_type") == 3]
     # Higher board, then seal amount, then earlier limit time: a transparent
@@ -165,16 +230,18 @@ def write_case(client: TdxClient, day: dt.date, next_day: dt.date) -> None:
               "- 说明：这是按公开框架做的条件化研究，不是小宝1105本人当日持仓或投资建议。", ""]
     lines += ["## 一、D 日盘后环境", "",
               f"- 环境判断：**{env['regime']}**",
-              f"- 涨停 {env['limit_up']} 家，炸板 {env['broken']} 家，跌停 {env['limit_down']} 家，炸板率 {fmt(env['broken_rate'])}%"]
+              f"- 涨停 {env['limit_up']} 家，炸板 {env['broken']} 家，跌停 {env['limit_down']} 家，炸板率 {fmt(env['broken_rate'])}%",
+              f"- 指数方向：{env['index_direction']}；指数关系：{env['index_alignment']}",
+              f"- 情绪轴：涨跌停差 {env['breadth_balance']}；风险压力 {env['risk_pressure']}；最高板 {env['emotion_axis']['highest_board']}"]
     for code, v in env["indices"].items():
         lines.append(f"- {code}：收盘 {fmt(v.get('close'))}，涨跌 {fmt(v.get('change_pct'))}%")
     lines += ["", "## 二、冻结的盘后候选（不可用 D+1 数据改写）", "",
-              "|代码|名称|板块/原因|板位|封单额|D日状态|",
-              "|---|---|---|---:|---:|---|"]
+              "|代码|名称|节点事实|题材/原因|题材梯队|题材内位置|市场最高板|板位|封单额|D日状态|",
+              "|---|---|---|---|---:|---:|---:|---:|---:|---|"]
     if not candidates:
         lines.append("|—|暂无合格候选|涨跌停梯队为空|—|—|暂无合格候选|")
     for r in candidates:
-        lines.append(f"|{r.get('full_code')}|{r.get('name')}|{r.get('limit_reason') or r.get('industry') or '缺失'}|{r.get('board_level') or '炸板'}|{fmt(r.get('seal_amount'),0)}|冻结|")
+        lines.append(f"|{r.get('full_code')}|{r.get('name')}|{r.get('node_facts')}|{r.get('theme')}|{r.get('theme_count')}|{r.get('theme_rank')}|{r.get('market_highest_board')}|{r.get('board_level') or '炸板'}|{fmt(r.get('seal_amount'),0)}|冻结|")
     lines += ["", "## 三、D+1 09:25 前竞价验货", "",
               "判定口径：超预期=开盘涨幅≥2%且 09:20→09:25 不明显走弱；符合预期=开盘不低于 -1.5% 且不明显走弱；否则不及预期。阈值是透明的工程化排序参数，不是作者原话。", "",
               "|代码|竞价等级|开盘涨跌|09:15价|09:20价|09:25价|09:20未匹配量方向|动作|", "|---|---|---:|---:|---:|---:|---:|---|"]

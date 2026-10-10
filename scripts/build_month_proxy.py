@@ -19,11 +19,14 @@ from eltdx import TdxClient
 ROOT = Path(__file__).resolve().parents[1]
 parser = argparse.ArgumentParser()
 parser.add_argument("--month", required=True, help="YYYY-MM")
+parser.add_argument("--case-dir", type=Path, help="Alternative frozen case directory")
+parser.add_argument("--output-stem", help="Output prefix under results/")
 args = parser.parse_args()
 MONTH = args.month
-CASE_DIR = ROOT / "cases" / MONTH
-OUT_ALL = ROOT / "results" / f"{MONTH}-market-outcomes.csv"
-OUT_TRADES = ROOT / "results" / f"{MONTH}-proxy-trades.csv"
+CASE_DIR = args.case_dir or ROOT / "cases" / MONTH
+OUTPUT_STEM = args.output_stem or MONTH
+OUT_ALL = ROOT / "results" / f"{OUTPUT_STEM}-market-outcomes.csv"
+OUT_TRADES = ROOT / "results" / f"{OUTPUT_STEM}-proxy-trades.csv"
 
 
 def pct(a: float | None, b: float | None) -> float | None:
