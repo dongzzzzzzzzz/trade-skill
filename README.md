@@ -13,12 +13,13 @@
 - `results/`：把案例转成真实执行结果前需要补充的记录。
 - `test-prompts.json`：给 Darwin 使用的交易场景测试集。
 - `scripts/`：案例索引和结果模板生成工具。
+- `evolution/experiments/`：每轮 Challenger 的假设、结果和保留/拒绝结论。
 
 ## 当前状态
 
 7 月案例已经完成“盘后冻结候选 + 次日竞价验货”，但还没有你的真实成交、买入价、卖出价和持有结果。因此当前只能作为 `v0` 规则基线，不能据此宣称收益提升，也不能直接让 Darwin 以默认 9 维 Skill 分数晋级交易规则。
 
-运行 `scripts/build_outcome_template.py` 可生成逐候选的 `results/2026-07-outcomes.csv`；补齐真实执行和结果后，再开始 Champion / Challenger 对照进化。
+运行 `scripts/build_outcome_template.py` 可生成逐候选的真实结果填写表；运行 `scripts/build_proxy_baseline.py` 可先生成一套明确标注为代理的 v0 基线，再开始 Champion / Challenger 对照进化。
 
 ## 使用 Darwin
 
