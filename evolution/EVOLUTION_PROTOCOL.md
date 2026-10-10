@@ -73,3 +73,7 @@
 `evolution/experiments/001-promote-observe.md` 是第一轮失败 Challenger。它被保留用于记录“为什么没有改主 Skill”，不是生产规则。
 
 `evolution/experiments/002-skip-locked-fallback.md` 是第二轮失败 Challenger。它同样不改变生产规则，但记录了用户提出的“一字不可成交后顺序递补”在当前代理口径下的结果。
+
+`evolution/experiments/003-correct-locked-auction.md` 修正了实验 002 的未来信息污染，并把锁板识别改为 09:25 前竞价字段。
+
+`evolution/experiments/004-positive-open-fallback.md` 是当前保留的 Challenger：平开候选不直接递补，继续沿原队列寻找更强的可执行候选；样本不足，暂不晋级。

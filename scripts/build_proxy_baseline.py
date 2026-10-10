@@ -34,6 +34,20 @@ def f(value: object) -> float | None:
         return None
 
 
+def pct_cell(value: str) -> float | None:
+    return f(value.replace("%", "").strip()) if value else None
+
+
+def locked_from_auction(symbol: str, open_change: float | None, drift: float | None) -> bool:
+    """Approximate one-word/locked auction from only pre-open fields."""
+    if open_change is None or drift is None or abs(drift) > 0.05:
+        return False
+    # ChiNext/STAR stocks have a 20% daily limit; ordinary stocks have 10%.
+    # Keep 5% for ST-style names when the case name makes that explicit.
+    limits = (20.0,) if symbol.startswith(("sz30", "sh68")) else (10.0,)
+    return any(abs(open_change - limit) <= 0.15 for limit in limits)
+
+
 def rows_in_table(block: str) -> list[list[str]]:
     rows = []
     for line in block.splitlines():
@@ -56,20 +70,37 @@ def load_case(path: Path) -> list[dict[str, object]]:
     decision_date, confirmation_date = dates.groups()
     candidates = rows_in_table(section(text, "## 3. 冻结候选（D 日盘后）", "## 4. D+1 竞价确认"))
     auction = rows_in_table(section(text, "## 4. D+1 竞价确认（截至 09:25）", "## 5. 当日结论与失效条件"))
-    action_by_symbol = {row[0]: row[-1] for row in auction if row}
+    auction_by_symbol = {
+        row[0]: {
+            "action": row[-1],
+            "auction_open_change": pct_cell(row[4]) if len(row) > 4 else None,
+            "auction_drift": pct_cell(row[6]) if len(row) > 6 else None,
+        }
+        for row in auction if row
+    }
     result = []
     for rank, row in enumerate(candidates, 1):
         if len(row) < 2 or row[0] in ("", "—"):
             continue
         symbol = row[0]
+        auction_info = auction_by_symbol.get(symbol, {})
+        action = auction_info.get("action", "不可判断")
+        locked = locked_from_auction(
+            symbol,
+            auction_info.get("auction_open_change"),
+            auction_info.get("auction_drift"),
+        )
         result.append({
             "decision_date": decision_date,
             "confirmation_date": confirmation_date,
             "rank": rank,
             "symbol": symbol,
             "name": row[1],
-            "auction_action": action_by_symbol.get(symbol, "不可判断"),
-            "proxy_eligible": "yes" if "可做" in action_by_symbol.get(symbol, "") else "no",
+            "auction_action": action,
+            "auction_open_change": auction_info.get("auction_open_change"),
+            "auction_drift": auction_info.get("auction_drift"),
+            "locked_auction": "yes" if locked else "no",
+            "proxy_eligible": "yes" if "可做" in action and not locked else "no",
         })
     return result
 
@@ -115,7 +146,7 @@ for decision_date, rows in by_date.items():
         "selected_rank": chosen["rank"],
         "symbol": chosen["symbol"],
         "name": chosen["name"],
-        "entry_rule": "first candidate whose case action contains 可做",
+        "entry_rule": "first candidate whose case action contains 可做 and whose auction is not locked",
         "entry_price": chosen["next_open"],
         "exit_rule": "same-day close",
         "exit_price": chosen["next_close"],
@@ -123,7 +154,7 @@ for decision_date, rows in by_date.items():
         "max_adverse_pct": chosen["proxy_mae_pct"],
     })
 
-all_fields = ["decision_date", "confirmation_date", "rank", "symbol", "name", "auction_action", "proxy_eligible", "next_open", "next_high", "next_low", "next_close", "proxy_return_pct", "proxy_mae_pct"]
+all_fields = ["decision_date", "confirmation_date", "rank", "symbol", "name", "auction_action", "auction_open_change", "auction_drift", "locked_auction", "proxy_eligible", "next_open", "next_high", "next_low", "next_close", "proxy_return_pct", "proxy_mae_pct"]
 trade_fields = ["decision_date", "confirmation_date", "selected_rank", "symbol", "name", "entry_rule", "entry_price", "exit_rule", "exit_price", "return_pct", "max_adverse_pct"]
 for output, fields, rows in ((OUT_ALL, all_fields, all_rows), (OUT_TRADES, trade_fields, trade_rows)):
     with output.open("w", encoding="utf-8", newline="") as handle:
