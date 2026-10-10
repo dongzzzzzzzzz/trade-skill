@@ -1,0 +1,8 @@
+decision_date,confirmation_date,selected_rank,symbol,name,entry_rule,entry_price,exit_rule,exit_price,return_pct,max_adverse_pct
+2026-07-01,2026-07-02,4,sh603137,恒尚节能,first candidate whose case action contains 可做,15.65,same-day close,15.65,0.0,0.0
+2026-07-03,2026-07-06,1,sh603137,恒尚节能,first candidate whose case action contains 可做,18.94,same-day close,18.94,0.0,0.0
+2026-07-09,2026-07-10,1,sh603137,恒尚节能,first candidate whose case action contains 可做,27.72,same-day close,26.75,-3.499278499278491,-4.256854256854259
+2026-07-14,2026-07-15,1,sh600664,哈药股份,first candidate whose case action contains 可做,4.32,same-day close,4.49,3.935185185185186,0.0
+2026-07-23,2026-07-24,1,sz001258,立新能源,first candidate whose case action contains 可做,12.99,same-day close,13.03,0.3079291762894565,-3.772132409545803
+2026-07-27,2026-07-28,1,sh603221,爱丽家居,first candidate whose case action contains 可做,16.94,same-day close,16.94,0.0,0.0
+2026-07-29,2026-07-30,1,sh603221,爱丽家居,first candidate whose case action contains 可做,20.49,same-day close,20.49,0.0,0.0
