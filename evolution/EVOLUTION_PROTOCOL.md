@@ -71,3 +71,5 @@
 ## 第一轮实验记录
 
 `evolution/experiments/001-promote-observe.md` 是第一轮失败 Challenger。它被保留用于记录“为什么没有改主 Skill”，不是生产规则。
+
+`evolution/experiments/002-skip-locked-fallback.md` 是第二轮失败 Challenger。它同样不改变生产规则，但记录了用户提出的“一字不可成交后顺序递补”在当前代理口径下的结果。
